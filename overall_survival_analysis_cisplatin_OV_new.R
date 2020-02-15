@@ -24,7 +24,8 @@ pcaSNPs=prcomp(SNPs, scale=TRUE)
 str(pcaSNPs$rotation)
 summary(pcaSNPs)
 a = scale(t(trans_GBM1[c("ENSG00000132382.13", "ENSG00000108559.10", "ENSG00000179409.9", "ENSG00000141456.13", "ENSG00000108561.7", "ENSG00000141499.15", "ENSG00000005100.11", "ENSG00000167721.9"),])) %*% pcaSNPs$rotation[,1]
-trans_gene = t(a[,1])                        
+#If the thresholds in pcaSNPs$rotation are negative, add minus sign in the following assignment statement.
+trans_gene = -t(a[,1])                        
 names(trans_gene) = rownames(a)
 names(trans_gene) = strtrim(names(trans_gene),12)
 
@@ -88,9 +89,9 @@ survival_array = survival_array[which((survival_array[,"HR_Status"] == "non-HRD"
 #classify patients according to their expression levels of the gene panel
 for (i in rownames(survival_array))
 {
-  if (survival_array[i,"Expression"] >= fivenum(survival_array[,"Expression"])[3])
-     survival_array[i, "Group"] = "Low"
   if (survival_array[i,"Expression"] <= fivenum(survival_array[,"Expression"])[3])
+     survival_array[i, "Group"] = "Low"
+  if (survival_array[i,"Expression"] >= fivenum(survival_array[,"Expression"])[3])
      survival_array[i, "Group"] = "High"
 }
 survival_array = survival_array[which((survival_array[,"Group"] == "High") | (survival_array[,"Group"] == "Low")), ]
